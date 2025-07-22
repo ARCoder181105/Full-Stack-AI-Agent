@@ -7,9 +7,11 @@ import { serve } from 'inngest/express'
 import { inngest } from './inngest/client.js'
 import { onUserSignup } from './inngest/functions/on-signup.js'
 import { onTicketCreated } from './inngest/functions/on-ticket-create.js'
+import dotenv from "dotenv"
 
 const app = express();
 const PORT = process.env.PORT || 3000
+dotenv.config()
 
 
 //middlewares
