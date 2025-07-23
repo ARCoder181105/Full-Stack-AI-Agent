@@ -24,8 +24,13 @@ function CheckAuth({ children, protectedRoute }) {
   }, [navigate, protectedRoute]);
 
   if (loading) {
-    return <div>loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen bg-base-200">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    );
   }
+
   return children;
 }
 
