@@ -30,7 +30,7 @@ export const onTicketCreated = inngest.createFunction(
 
             const moderator = await step.run('assign-moderator-and-update-ticket', async () => {
                 let user;
-                const skills = aiResponse?.relatedSkills || [];
+                const skills = aiResponse.relatedSkills || [];
 
                 if (skills.length > 0) {
                     user = await User.findOne({
