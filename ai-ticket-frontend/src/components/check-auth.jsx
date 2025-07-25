@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function CheckAuth({ children, protectedRoute }) {
+function CheckAuth({ children, protected: isProtectedRoute }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    if (protectedRoute) {
+    if (isProtectedRoute) {
       if (!token) {
         navigate("/login");
       } else {
@@ -16,12 +16,12 @@ function CheckAuth({ children, protectedRoute }) {
       }
     } else {
       if (token) {
-        navigate("/");
+        navigate("/tickets"); // Redirect to the main tickets page if logged in
       } else {
         setLoading(false);
       }
     }
-  }, [navigate, protectedRoute]);
+  }, [navigate, isProtectedRoute]);
 
   if (loading) {
     return (

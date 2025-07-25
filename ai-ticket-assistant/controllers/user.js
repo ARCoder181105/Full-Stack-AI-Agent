@@ -8,9 +8,12 @@ import { inngest } from '../inngest/client.js';
 export const signup = async (req, res) => {
     const { email, password, skills = [] } = req.body;
     try {
+        const userCount = await User.countDocuments();
+        const role = userCount === 0 ? 'admin' : 'user';
+
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = await User.create({ email, password: hashedPassword, skills });
+        const user = await User.create({ email, password: hashedPassword, skills, role });
 
         await inngest.send({
             name: "user/signup",
@@ -22,7 +25,6 @@ export const signup = async (req, res) => {
             process.env.JWT_SECRET
         );
 
-        // IMPROVEMENT: Avoid sending the password back to the client
         const userResponse = {
             _id: user._id,
             email: user.email,
@@ -42,20 +44,17 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        // FIX: Added 'await' to User.findOne to get the user document.
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(401).json({ error: "Invalid Credentials" });
         }
 
-        // FIX: Added 'await' to bcrypt.compare, as it's an async operation.
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
             return res.status(401).json({ error: "Invalid Credentials" });
         }
 
-        // FIX: Changed jwt.login to the correct method, jwt.sign.
         const token = jwt.sign(
             { _id: user._id, role: user.role },
             process.env.JWT_SECRET
@@ -64,14 +63,13 @@ export const login = async (req, res) => {
         res.json({ user, token });
 
     } catch (error) {
-        // FIX: Corrected error response syntax.
         res.status(500).json({ error: "Login Failed", details: error.message });
     }
 };
 
 export const logout = async (req, res) => {
     try {
-        const token = req.headers.authorization?.split(" ")[1]; // Added optional chaining for safety
+        const token = req.headers.authorization?.split(" ")[1];
         if (!token) {
             return res.status(401).json({ error: "Unauthorized" });
         }
@@ -82,8 +80,6 @@ export const logout = async (req, res) => {
             }
         });
 
-        // Note: For stateless JWT, "logout" on the server is typically just verifying the token is valid.
-        // The actual logout happens on the client by deleting the token.
         res.json({ message: "Logout successfully" });
 
     } catch (error) {
@@ -99,7 +95,7 @@ export const updateUser = async (req, res) => {
         }
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(404).json({ error: "User not found" }); // Use 404 for not found
+            return res.status(404).json({ error: "User not found" });
         }
 
         await User.updateOne(
@@ -114,6 +110,7 @@ export const updateUser = async (req, res) => {
     }
 };
 
+// FIX: Renamed this function from getUser to getUsers
 export const getUsers = async (req, res) => {
     try {
         if (req.user?.role !== "admin") {
