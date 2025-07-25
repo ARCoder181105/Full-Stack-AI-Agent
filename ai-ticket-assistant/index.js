@@ -8,10 +8,10 @@ import { inngest } from './inngest/client.js'
 import { onUserSignup } from './inngest/functions/on-signup.js'
 import { onTicketCreated } from './inngest/functions/on-ticket-create.js'
 import dotenv from "dotenv"
+dotenv.config()
 
 const app = express();
 const PORT = process.env.PORT || 3000
-dotenv.config()
 
 
 //middlewares
@@ -20,7 +20,6 @@ app.use(express.json())
 
 app.use('/api/auth', userRoutes)
 app.use('/api/tickets', ticketRoutes)
-
 app.use('/api/inngest', serve({
     client: inngest,
     functions: [onUserSignup, onTicketCreated]
