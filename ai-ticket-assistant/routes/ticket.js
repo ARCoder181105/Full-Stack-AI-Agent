@@ -7,6 +7,6 @@ const router = express.Router();//best for writing the route in the different fi
 
 router.get('/', authenticate, getTickets)
 router.get('/:id', authenticate, getTicket)
-router.get('/', authenticate, createTicket)
+router.post('/', authenticate, createTicket)
 
 export default router;

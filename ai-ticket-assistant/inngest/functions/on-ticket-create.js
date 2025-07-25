@@ -22,7 +22,7 @@ export const onTicketCreated = inngest.createFunction(
             });
 
             await step.run('update-ticket-status', async () => {
-                await Ticket.findByIdAndUpdate(ticket._id, { staus: "TODO" });
+                await Ticket.findByIdAndUpdate(ticket._id, { status: "TODO" });
             });
 
             const aiResponse = await analyzeTicket(ticket);
@@ -74,7 +74,7 @@ export const onTicketCreated = inngest.createFunction(
             return { success: true }; 
 
         } catch (error) {
-            console.error("❌ Error running the step", err.message);
+            console.error("❌ Error running the step", error.message);
             return { success: false };
         }
     }

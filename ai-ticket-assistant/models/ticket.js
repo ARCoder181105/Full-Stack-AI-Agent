@@ -8,7 +8,7 @@ const ticketSchema = new mongoose.Schema({
     assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
     priority: { type: String },
     deadline: Date,
-    helpfullNotes: String,
+    helpfulNotes: String,
     relatedSkills: [String],
     createdAt: { type: Date, default: Date.now },
 })

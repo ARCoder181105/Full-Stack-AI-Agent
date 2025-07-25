@@ -8,17 +8,13 @@ import { inngest } from '../inngest/client.js';
 export const signup = async (req, res) => {
     const { email, password, skills = [] } = req.body;
     try {
-        // FIX: Added 'await' to bcrypt.hash, as it's an async operation.
         const hashedPassword = await bcrypt.hash(password, 10);
-        
+
         const user = await User.create({ email, password: hashedPassword, skills });
-        
-        // Fire Inngest event
+
         await inngest.send({
             name: "user/signup",
-            data: {
-                email,
-            }
+            data: { email }
         });
 
         const token = jwt.sign(
@@ -26,10 +22,18 @@ export const signup = async (req, res) => {
             process.env.JWT_SECRET
         );
 
-        res.json({ user, token });
+        // IMPROVEMENT: Avoid sending the password back to the client
+        const userResponse = {
+            _id: user._id,
+            email: user.email,
+            role: user.role,
+            skills: user.skills,
+            createdAt: user.createdAt
+        };
+
+        res.json({ user: userResponse, token });
 
     } catch (error) {
-        // FIX: Corrected error response syntax. Use status() instead of send().
         res.status(500).json({ error: "Signup Failed", details: error.message });
     }
 };
@@ -43,7 +47,7 @@ export const login = async (req, res) => {
         if (!user) {
             return res.status(401).json({ error: "Invalid Credentials" });
         }
-        
+
         // FIX: Added 'await' to bcrypt.compare, as it's an async operation.
         const isMatch = await bcrypt.compare(password, user.password);
 
@@ -71,7 +75,7 @@ export const logout = async (req, res) => {
         if (!token) {
             return res.status(401).json({ error: "Unauthorized" });
         }
-        
+
         jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
             if (err) {
                 return res.status(401).json({ error: "Unauthorized" });
@@ -98,21 +102,19 @@ export const updateUser = async (req, res) => {
             return res.status(404).json({ error: "User not found" }); // Use 404 for not found
         }
 
-        // FIX: Corrected typo from 'lenght' to 'length'.
         await User.updateOne(
             { email },
             { skills: skills.length ? skills : user.skills, role }
         );
-        
+
         return res.json({ message: "User updated successfully" });
 
     } catch (error) {
-        // FIX: Corrected error response syntax.
         res.status(500).json({ error: "User update failed", details: error.message });
     }
 };
 
-export const getUser = async (req, res) => {
+export const getUsers = async (req, res) => {
     try {
         if (req.user?.role !== "admin") {
             return res.status(403).json({ error: "Forbidden" });

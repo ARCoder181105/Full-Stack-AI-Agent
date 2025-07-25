@@ -34,8 +34,8 @@ export default function SignupPage() {
       } else {
         alert(data.message || "Signup failed");
       }
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
       alert("Something went wrong");
     } finally {
       setLoading(false);
