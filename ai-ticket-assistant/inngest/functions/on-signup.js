@@ -1,5 +1,5 @@
 import { inngest } from "../client.js";
-import User from "../../models/User.js"; // Corrected import
+import User from "../../models/User.js";
 import { NonRetriableError } from "inngest";
 import { sendMail } from "../../utils/mailer.js";
 
@@ -9,6 +9,7 @@ export const onUserSignup = inngest.createFunction(
   async ({ event, step }) => {
     try {
       const { email } = event.data;
+
       const user = await step.run("get-user-email", async () => {
         const userObject = await User.findOne({ email });
         if (!userObject) {
@@ -17,20 +18,22 @@ export const onUserSignup = inngest.createFunction(
         return userObject;
       });
 
-      // Corrected typo from 'setp' to 'step'
       await step.run("send-welcome-email", async () => {
-        const subject = `Welcome to the app`;
-        const message = `Hi,
-            \n\n
-            Thanks for signing up. We're glad to have you onboard!
-            `;
-        await sendMail(user.email, subject, message);
+        const subject = "Welcome to the App!";
+        const text = `Hi ${user.name || ""},\n\nThanks for signing up. We're glad to have you onboard!`;
+        const html = `
+          <h2>Hi ${user.name || "there"},</h2>
+          <p>Thanks for signing up. We're excited to have you with us! 🎉</p>
+          <p>— The Team</p>
+        `;
+
+        await sendMail({ to: user.email, subject, text, html });
       });
 
       return { success: true };
     } catch (error) {
-      console.error("❌ Error running step", error.message);
-      return { success: false };
+      console.error("❌ Error in Inngest Function:", error.stack || error.message);
+      return { success: false, message: error.message };
     }
   }
 );
