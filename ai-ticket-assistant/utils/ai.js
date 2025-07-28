@@ -1,63 +1,51 @@
+// src/utils/ai.js
 import { createAgent, gemini } from "@inngest/agent-kit";
 
-const analyzeTicket = async (ticket) => {
+/**
+ * Analyzes a support ticket using an AI agent to extract structured data.
+ * @param {object} step - The Inngest step object.
+ * @param {object} ticket - The ticket object containing title and description.
+ * @returns {Promise<object|null>} A promise that resolves to a JSON object with the analysis or null on failure.
+ */
+const analyzeTicket = async (step, ticket) => {
     const supportAgent = createAgent({
         model: gemini({
-            model: "gemini-1.5-flash",
+            model: "gemini-1.5-flash-8b",
             apiKey: process.env.GEMINI_API_KEY,
         }),
         name: "AI Ticket Triage Assistant",
-        system: `You are an expert AI assistant that processes technical support tickets. 
+        system: `You are an expert AI assistant that processes technical support tickets. Your task is to analyze the ticket information and respond with *only* a valid, raw JSON object.
 
-Your job is to:
-1. Summarize the issue.
-2. Estimate its priority.
-3. Provide helpful notes and resource links for human moderators.
-4. List relevant technical skills required.
+Do NOT include markdown, code fences (like \`\`\`json), comments, or any extra text.
 
-IMPORTANT:
-- Respond with *only* valid raw JSON.
-- Do NOT include markdown, code fences, comments, or any extra formatting.
-- The format must be a raw JSON object.
-
-Repeat: Do not wrap your output in markdown or code fences.`,
+The JSON object must have the following structure:
+- "summary": A short 1-2 sentence summary of the issue.
+- "priority": One of "low", "medium", or "high".
+- "helpfulNotes": A detailed technical explanation and potential steps for a human moderator to resolve the issue. Include external resource links if relevant.
+- "relatedSkills": An array of technical skills required to solve this (e.g., ["React", "MongoDB", "CSS"]).`,
     });
 
-    const response =
-        await supportAgent.run(`You are a ticket triage agent. Only return a strict JSON object with no extra text, headers, or markdown.
-        
-Analyze the following support ticket and provide a JSON object with:
-
-- summary: A short 1-2 sentence summary of the issue.
-- priority: One of "low", "medium", or "high".
-- helpfulNotes: A detailed technical explanation that a moderator can use to solve this issue. Include useful external links or resources if possible.
-- relatedSkills: An array of relevant skills required to solve the issue (e.g., ["React", "MongoDB"]).
-
-Respond ONLY in this JSON format and do not include any other text or markdown in the answer:
-
-{
-"summary": "Short summary of the ticket",
-"priority": "high",
-"helpfulNotes": "Here are useful tips...",
-"relatedSkills": ["React", "Node.js"]
-}
-
----
-
-Ticket information:
-
-- Title: ${ticket.title}
-- Description: ${ticket.description}`
+    try {
+        const response = await supportAgent.run(
+            `Ticket Title: ${ticket.title}\nTicket Description: ${ticket.description}`
         );
 
-    const raw = response.output[0].context;
+        console.log("🧠 Full AI response:", response);
 
-    try {
-        const match = raw.match(/```json\s*([\s\S]*?)\s*```/i);
-        const jsonString = match ? match[1] : raw.trim();
-        return JSON.parse(jsonString);
+        const rawOutput = response.output?.[0]?.content;
+
+        if (!rawOutput || typeof rawOutput !== "string") {
+            console.error("❌ AI output is missing or malformed");
+            return null;
+        }
+
+        // ✅ Remove code block fences like ```json ... ```
+        const cleaned = rawOutput.replace(/```json|```/g, "").trim();
+
+        // ✅ Parse the cleaned string into a JSON object
+        return JSON.parse(cleaned);
     } catch (e) {
-        console.log("Failed to parse JSON from AI response" + e.message);
+        console.error("❌ Failed to analyze ticket:", e.message);
         return null;
     }
 };
