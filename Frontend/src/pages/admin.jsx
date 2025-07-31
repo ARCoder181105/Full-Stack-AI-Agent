@@ -43,24 +43,21 @@ export default function AdminPanel() {
 
   const handleUpdate = async () => {
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/api/auth/update-user`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            email: editingUser,
-            role: formData.role,
-            skills: formData.skills
-              .split(",")
-              .map((skill) => skill.trim())
-              .filter(Boolean),
-          }),
-        }
-      );
+      const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/auth/update-user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          email: editingUser,
+          role: formData.role,
+          skills: formData.skills
+            .split(",")
+            .map((skill) => skill.trim())
+            .filter(Boolean),
+        }),
+      });
 
       const data = await res.json();
       if (!res.ok) {
@@ -86,83 +83,74 @@ export default function AdminPanel() {
 
   return (
     <>
-      <Navbar/>
-      <div className="max-w-4xl mx-auto mt-10">
-        <h1 className="text-2xl font-bold mb-6">Admin Panel - Manage Users</h1>
-        <input
-          type="text"
-          className="input input-bordered w-full mb-6"
-          placeholder="Search by email"
-          value={searchQuery}
-          onChange={handleSearch}
-        />
-        {filteredUsers.map((user) => (
-          <div
-            key={user._id}
-            className="bg-base-100 shadow rounded p-4 mb-4 border"
-          >
-            <p>
-              <strong>Email:</strong> {user.email}
-            </p>
-            <p>
-              <strong>Current Role:</strong> {user.role}
-            </p>
-            <p>
-              <strong>Skills:</strong>{" "}
-              {user.skills && user.skills.length > 0
-                ? user.skills.join(", ")
-                : "N/A"}
-            </p>
+      <Navbar />
+      <div className="min-h-screen pt-24 px-4 md:px-8 bg-[#0e0e10] text-white">
+        <div className="max-w-5xl mx-auto">
+          <h1 className="text-3xl font-bold mb-8 text-cyan-400">Admin Panel - Manage Users</h1>
 
-            {editingUser === user.email ? (
-              <div className="mt-4 space-y-2">
-                <select
-                  className="select select-bordered w-full"
-                  value={formData.role}
-                  onChange={(e) =>
-                    setFormData({ ...formData, role: e.target.value })
-                  }
-                >
-                  <option value="user">User</option>
-                  <option value="moderator">Moderator</option>
-                  <option value="admin">Admin</option>
-                </select>
+          <input
+            type="text"
+            className="input input-bordered w-full mb-8 bg-[#1c1c1e] text-white placeholder-gray-400"
+            placeholder="Search users by email..."
+            value={searchQuery}
+            onChange={handleSearch}
+          />
 
-                <input
-                  type="text"
-                  placeholder="Comma-separated skills"
-                  className="input input-bordered w-full"
-                  value={formData.skills}
-                  onChange={(e) =>
-                    setFormData({ ...formData, skills: e.target.value })
-                  }
-                />
+          {filteredUsers.map((user) => (
+            <div
+              key={user._id}
+              className="bg-[#1a1a1c] border border-[#2a2a2e] rounded-2xl p-5 mb-5 shadow-md hover:shadow-cyan-600/20 transition-shadow duration-300"
+            >
+              <p><span className="font-semibold text-cyan-300">Email:</span> {user.email}</p>
+              <p><span className="font-semibold text-purple-300">Role:</span> {user.role}</p>
+              <p><span className="font-semibold text-yellow-300">Skills:</span> {user.skills?.length ? user.skills.join(", ") : "N/A"}</p>
 
-                <div className="flex gap-2">
-                  <button
-                    className="btn btn-success btn-sm"
-                    onClick={handleUpdate}
+              {editingUser === user.email ? (
+                <div className="mt-4 space-y-3">
+                  <select
+                    className="select select-bordered w-full bg-[#121212] text-white"
+                    value={formData.role}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                   >
-                    Save
-                  </button>
-                  <button
-                    className="btn btn-ghost btn-sm"
-                    onClick={() => setEditingUser(null)}
-                  >
-                    Cancel
-                  </button>
+                    <option value="user">User</option>
+                    <option value="moderator">Moderator</option>
+                    <option value="admin">Admin</option>
+                  </select>
+
+                  <input
+                    type="text"
+                    placeholder="Comma-separated skills"
+                    className="input input-bordered w-full bg-[#121212] text-white placeholder-gray-400"
+                    value={formData.skills}
+                    onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
+                  />
+
+                  <div className="flex gap-3">
+                    <button
+                      className="btn btn-success hover:scale-105 transition-transform"
+                      onClick={handleUpdate}
+                    >
+                      Save
+                    </button>
+                    <button
+                      className="btn btn-outline hover:bg-red-500 hover:text-white"
+                      onClick={() => setEditingUser(null)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <button
-                className="btn btn-primary btn-sm mt-2"
-                onClick={() => handleEditClick(user)}
-              >
-                Edit
-              </button>
-            )}
-          </div>
-        ))}
+              ) : (
+                <button
+                  className="btn btn-info mt-4 hover:scale-105 transition-transform"
+                  onClick={() => handleEditClick(user)}
+                >
+                  Edit
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </>
   );
