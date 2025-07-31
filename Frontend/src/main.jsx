@@ -15,7 +15,6 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-        {/* Main App Layout with Navbar */}
         <Route element={<App />}>
           <Route
             path="/"
