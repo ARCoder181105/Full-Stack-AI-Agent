@@ -34,6 +34,10 @@ An intelligent, full-stack ticketing system designed to streamline technical sup
 - **🛠 Admin Panel**  
   Manage user roles and skills via a dedicated admin interface.
 
+  ### 🔑 Admin Credentials (for demo purposes)
+  > **Email**: `stark@gmail.com`  
+  > **Password**: `123456789`
+
 ---
 
 ## 🧰 Tech Stack
@@ -87,6 +91,6 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## 🙌 Acknowledgements
 
-- Google for the Gemini API
-- Inngest for background job support
+- Google for the Gemini API  
+- Inngest for background job support  
 - Open-source community ❤️
