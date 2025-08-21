@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import { LogOut, Settings, User, Ticket } from "lucide-react";
 
 export default function Navbar() {
   const token = localStorage.getItem("token");
@@ -15,36 +16,74 @@ export default function Navbar() {
   };
 
   return (
-    <div className="navbar fixed w-full top-0 z-50 bg-[#0f0f0f]/70 backdrop-blur-md  text-white font-mono">
-      <div className="flex-1">
-        <Link to="/" className="btn btn-ghost text-xl normal-case text-purple-400">
-          Ticket AI
-        </Link>
-      </div>
-      <div className="flex gap-2 items-center">
-        {!token ? (
-          <>
-            <Link to="/signup" className="btn btn-md px-4 py-2 hover:bg-purple-600 border-purple-500 text-white">
-              Signup
+    <nav className="fixed w-full top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <div className="flex items-center">
+            <Link 
+              to="/" 
+              className="flex items-center space-x-2 text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors"
+            >
+              <Ticket className="h-6 w-6 text-blue-600" />
+              <span>TicketPro</span>
             </Link>
-            <Link to="/login" className="btn btn-md px-4 py-2 hover:bg-pink-600 border-pink-500 text-white">
-              Login
-            </Link>
-          </>
-        ) : (
-          <>
-            <p className="text-sm">Hi, {user?.email}</p>
-            {user?.role === "admin" && (
-              <Link to="/admin" className="btn btn-md px-4 py-2 border-blue-500 hover:bg-blue-600 text-white">
-                Admin
-              </Link>
+          </div>
+
+          {/* Navigation Items */}
+          <div className="flex items-center space-x-4">
+            {!token ? (
+              <div className="flex items-center space-x-3">
+                <Link 
+                  to="/login" 
+                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link 
+                  to="/signup" 
+                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+                >
+                  Get Started
+                </Link>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-4">
+                {/* User Info */}
+                <div className="flex items-center space-x-2 px-3 py-2 bg-gray-50 rounded-lg">
+                  <User className="h-4 w-4 text-gray-500" />
+                  <span className="text-sm font-medium text-gray-700">{user?.email}</span>
+                  {user?.role === "admin" && (
+                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                      Admin
+                    </span>
+                  )}
+                </div>
+
+                {/* Admin Button */}
+                {user?.role === "admin" && (
+                  <Link 
+                    to="/admin" 
+                    className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  >
+                    <Settings className="h-4 w-4" />
+                    <span>Admin</span>
+                  </Link>
+                )}
+
+                {/* Logout Button */}
+                <button 
+                  onClick={logout} 
+                  className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
             )}
-            <button onClick={logout} className="btn btn-md px-4 py-2 border-red-500 hover:bg-red-600 text-white">
-              Logout
-            </button>
-          </>
-        )}
+          </div>
+        </div>
       </div>
-    </div>
+    </nav>
   );
 }
