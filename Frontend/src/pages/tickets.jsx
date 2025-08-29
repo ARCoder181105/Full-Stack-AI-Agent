@@ -98,7 +98,7 @@ export default function Tickets() {
                     value={form.title}
                     onChange={handleChange}
                     placeholder="Briefly describe your issue"
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     required
                   />
                 </div>

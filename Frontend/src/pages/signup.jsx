@@ -80,7 +80,7 @@ export default function SignupPage() {
                     type="email"
                     name="email"
                     placeholder="Enter your email"
-                    className="w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                    className="w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 text-black"
                     value={form.email}
                     onChange={handleChange}
                     required
@@ -101,7 +101,7 @@ export default function SignupPage() {
                     type="password"
                     name="password"
                     placeholder="Create a secure password"
-                    className="w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                    className="w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 text-black"
                     value={form.password}
                     onChange={handleChange}
                     required
